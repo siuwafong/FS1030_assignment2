@@ -1,0 +1,125 @@
+const fs = require("fs");
+const express = require("express");
+const fileUpload = require("express-fileupload");
+const bodyParser = require("body-parser");
+const mysql = require("mysql");
+const path = require("path");
+const app = express();
+
+const db = mysql.createConnection({
+  // Replace with user-appropriate values
+  host: "localhost",
+  user: "root",
+  password: "uGotY0rked",
+  database: "customer_support"
+});
+
+module.exports = {
+  createTicket: (req, res) => {
+    let cust_id = req.params.id;
+    console.log(cust_id);
+
+    let createTicketQuery =
+      "INSERT INTO tickets (acquired_time, est_support_time, ticket_status, created_by) VALUES (NOW(), DATE_ADD(CURDATE(), INTERVAL 10 MINUTE), 'active', ?);";
+    db.query(createTicketQuery, [cust_id]);
+    let query =
+      "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets WHERE ticket_status = 'active' AND created_by = ?";
+    db.query(query, [cust_id], (err, result) => {
+      if (err) {
+        throw err;
+      }
+      const tickets = result.map(res => {
+        return {
+          ticket_no: res.ticket_no,
+          acquired_time: res.acquired_time,
+          est_support_time: res.est_support_time,
+          ticket_status: res.ticket_status
+        };
+      });
+      let query2 =
+        "SELECT CONCAT(customer_fname, ' ', customer_lname) AS full_name, customer_id from customers WHERE customer_id = ?;";
+      db.query(query2, [cust_id], (err, result) => {
+        if (err) {
+          throw err;
+        }
+        const full_name = result.map(res => {
+          return {
+            full_name: res.full_name,
+            customer_id: res.customer_id
+          };
+        });
+        res.render("customer_page", {
+          tickets: tickets,
+          full_name: full_name
+        });
+      });
+    });
+  },
+
+  deleteTicket: (req, res) => {
+    console.log(req.params.id);
+    let ticket_no = req.params.id;
+    let status = "";
+    let deleteTicketQuery = "";
+
+    let statusQuery = "SELECT ticket_status FROM tickets WHERE ticket_no = ?;";
+    db.query(statusQuery, [ticket_no], (err, result) => {
+      if (err) {
+        throw err;
+      }
+      status = result.map(res => {
+        return {
+          ticket_status: res.ticket_status
+        };
+      });
+      console.log(status[0]["ticket_status"]);
+      if (status[0]["ticket_status"] === "active") {
+        deleteTicketQuery =
+          "UPDATE tickets SET ticket_status = 'completed' WHERE ticket_no = ? ;";
+      } else if (status[0]["ticket_status"] === "completed") {
+        deleteTicketQuery =
+          "UPDATE tickets SET ticket_status = 'active' WHERE ticket_no = ? ;";
+      }
+      db.query(deleteTicketQuery, [ticket_no], (err, result) => {
+        if (err) {
+          throw err;
+        }
+        res.redirect("/");
+      });
+    });
+
+    // let query =
+    //   "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets";
+    // db.query(query, [ticket_no], (err, result) => {
+    //   if (err) {
+    //     throw err;
+    //   }
+    //   const tickets = result.map(res => {
+    //     return {
+    //       ticket_no: res.ticket_no,
+    //       acquired_time: res.acquired_time,
+    //       est_support_time: res.est_support_time,
+    //       ticket_status: res.ticket_status
+    //     };
+    //   });
+    //   res.render("staff_page.ejs", { tickets: tickets });
+
+    //   let query2 =
+    //     "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets";
+    //   db.query(query2, (err, result) => {
+    //     if (err) {
+    //       throw err;
+    //     }
+    //     const tickets = result.map(res => {
+    //       return {
+    //         ticket_no: res.ticket_no,
+    //         acquired_time: res.acquired_time,
+    //         est_support_time: res.est_support_time,
+    //         ticket_status: res.ticket_status
+    //       };
+    //     });
+    //     res.render("staff_page.ejs", { tickets: tickets });
+    //   });
+    // });
+  }
+};

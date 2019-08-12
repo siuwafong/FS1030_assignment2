@@ -1,0 +1,35 @@
+<% include partials/header.ejs %>
+
+<h1> STAFF PAGE </h1>
+<h2> TICKETS </h2>
+
+<form action="/" method="delete">
+<span>Mark as Completed </span> 
+<input id="ticketInput" placeholder="Ticket Number" name="ticket_no" type="number" min="1">
+<button> Submit </button>
+</form>
+
+<table>
+<thead>
+    <th id="sortTable0"> Ticket Number </th>
+    <th id="sortTable1"> acquired_time Time </th>
+    <th id="sortTable2"> Estimated Support Time </th>
+    <th id="sortTable3"> Ticket Status </th>
+</thead>
+<tbody>
+<% for(let i = 0; i < tickets.length; i++) {%>
+    <tr>
+    <td> <%= tickets[i]['ticket_no'] %></td>
+    <td> <%= tickets[i]['acquired_time'] %> </td> 
+    <td> <%= tickets[i]['est_support_time'] %> </td>
+    <td> <%= tickets[i]['ticket_status'] %> </td>
+    <% let link = tickets[i]['ticket_no'] %>
+    <td> <a href="/delete/<%= link %>"> TOGGLE </a> </td>
+
+    </tr>
+<% } %>
+</tbody>
+</table>
+
+
+<% include partials/footer.ejs %>

@@ -6,13 +6,14 @@ const path = require("path");
 const app = express();
 
 const db = mysql.createConnection({
+  // Replace with user-appropriate values
   host: "localhost",
   user: "root",
   password: "uGotY0rked",
-  database: "fs1030_assignment_2"
+  database: "customer_support"
 });
 
-// const { getHomePage } = require("./routes/index");
+const { createTicket, deleteTicket } = require("./routes/ticket");
 
 const port = 3000;
 app.set("port", process.env.port || port);
@@ -34,42 +35,61 @@ db.connect(err => {
   console.log("MySQL connected");
 });
 
+app.get("/:id", (req, res) => {
+  const userID = req.params.id;
+  let query =
+    "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets WHERE created_by = ?";
+  db.query(query, [userID], (err, result) => {
+    if (err) {
+      throw err;
+    }
+    const tickets = result.map(res => {
+      return {
+        ticket_no: res.ticket_no,
+        acquired_time: res.acquired_time,
+        est_support_time: res.est_support_time,
+        ticket_status: res.ticket_status
+      };
+    });
+    let query2 =
+      "SELECT CONCAT(customer_fname, ' ', customer_lname) AS full_name, customer_id from customers WHERE customer_id = ?;";
+    db.query(query2, [userID], (err, result) => {
+      if (err) {
+        throw err;
+      }
+      const full_name = result.map(res => {
+        return {
+          full_name: res.full_name,
+          customer_id: res.customer_id
+        };
+      });
+      console.log(full_name[0]["customer_id"]);
+      res.render("customer_page", {
+        tickets: tickets,
+        full_name: full_name
+      });
+    });
+  });
+});
+
 app.get("/", (req, res) => {
-  let query = "SELECT * from book_copies";
+  let query =
+    "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets";
   db.query(query, (err, result) => {
     if (err) {
       throw err;
     }
-    const book_copies = result.map(res => {
+    const tickets = result.map(res => {
       return {
-        "book id": res.copies_book_id,
-        "branch id": res.copies_branch_id,
-        "# of copies": res.no_of_copies
+        ticket_no: res.ticket_no,
+        acquired_time: res.acquired_time,
+        est_support_time: res.est_support_time,
+        ticket_status: res.ticket_status
       };
     });
-    res.json(book_copies);
-    console.log(result);
-    // const book_copies = result;
-    // res.render("index.ejs", {
-    //   title: "Book List | Book Info",
-    //   data: result
-    // });
+    res.render("staff_page.ejs", { tickets: tickets });
   });
 });
 
-db.query("SELECT * from book_copies", function(error, results, fields) {
-  if (error) {
-    throw error;
-  }
-  console.log("The solution is: ", results[2]);
-});
-
-// app.get("/", (req, res) => {
-//   db.query("SELECT * from book_copies", function(error, results, fields) {
-//     if (error) {
-//       throw error;
-//     }
-//     console.log("The solution is: ", results[1]);
-//     res.sendstatus(200);
-//   });
-// });
+app.post("/:id", createTicket);
+app.get("/delete/:id", deleteTicket);
