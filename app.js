@@ -13,7 +13,7 @@ const db = mysql.createConnection({
   database: "customer_support"
 });
 
-const { createTicket, deleteTicket } = require("./routes/ticket");
+const { createTicket, toggleTicket } = require("./routes/ticket");
 
 const port = 3000;
 app.set("port", process.env.port || port);
@@ -38,7 +38,7 @@ db.connect(err => {
 app.get("/:id", (req, res) => {
   const userID = req.params.id;
   let query =
-    "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets WHERE created_by = ?";
+    "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets WHERE ticket_status = 'active' AND created_by = ?";
   db.query(query, [userID], (err, result) => {
     if (err) {
       throw err;
@@ -92,4 +92,4 @@ app.get("/", (req, res) => {
 });
 
 app.post("/:id", createTicket);
-app.get("/delete/:id", deleteTicket);
+app.get("/toggle/:id", toggleTicket);

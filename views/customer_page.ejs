@@ -1,15 +1,21 @@
 <% include partials/header.ejs %>
 
+<div class="jumbotron">
 <h1> CUSTOMER PAGE </h1>
 <h2> TICKETS </h2>
 <h3> Welcome, <%= full_name[0]['full_name'] %></h3>
 <h4> Customer ID: <%= full_name[0]['customer_id'] %> </h4>
+<p> Here are your active tickets.  To see all your tickets, click <a href="https://www.google.ca" class="font-italic"> here </a>  </p>
+<form method="post" enctype="multipart/form-data">
+<button href="/<%= full_name[0]['customer_id'] %>" name="create_ticket" id="create_ticket"> Create Ticket </button>
+</form>
+</div>
 
-<table>
-<thead>
-    <th id="sortTable0"> Ticket # </th>
-    <th id="sortTable1"> acquired_time Time </th>
-    <th id="sortTable2"> Estimated Support Time </th>
+<table class="table table-striped">
+<thead class="thead-dark">
+    <th> Ticket # </th>
+    <th> Acquired Time </th>
+    <th> Estimated Support Time </th>
 </thead>
 <tbody>
 <% for(let i = 0; i < tickets.length; i++) {%>
@@ -22,8 +28,6 @@
 </tbody>
 </table>
 
-<form method="post" enctype="multipart/form-data">
-<button href="/<%= full_name[0]['customer_id'] %>" name="create_ticket" id="create_ticket"> Create Ticket </button>
-</form>
+
 
 <% include partials/footer.ejs %>

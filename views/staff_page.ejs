@@ -1,20 +1,18 @@
 <% include partials/header.ejs %>
 
+<div class="jumbotron"> 
 <h1> STAFF PAGE </h1>
 <h2> TICKETS </h2>
+</div>
 
-<form action="/" method="delete">
-<span>Mark as Completed </span> 
-<input id="ticketInput" placeholder="Ticket Number" name="ticket_no" type="number" min="1">
-<button> Submit </button>
-</form>
 
-<table>
-<thead>
-    <th id="sortTable0"> Ticket Number </th>
-    <th id="sortTable1"> acquired_time Time </th>
-    <th id="sortTable2"> Estimated Support Time </th>
-    <th id="sortTable3"> Ticket Status </th>
+
+<table class="table table-striped" id="myTable2">
+<thead class="thead-dark">
+    <th onclick="sortTable(0)"> Ticket Number </th>
+    <th onclick="sortTable(1)"> Acquired Time </th>
+    <th onclick="sortTable(2)"> Estimated Support Time </th>
+    <th onclick="sortTable(3)"> Ticket Status </th>
 </thead>
 <tbody>
 <% for(let i = 0; i < tickets.length; i++) {%>
@@ -24,7 +22,7 @@
     <td> <%= tickets[i]['est_support_time'] %> </td>
     <td> <%= tickets[i]['ticket_status'] %> </td>
     <% let link = tickets[i]['ticket_no'] %>
-    <td> <a href="/delete/<%= link %>"> TOGGLE </a> </td>
+    <td> <a href="/toggle/<%= link %>" class="btn btn-sm btn-primary"> TOGGLE </a> </td>
 
     </tr>
 <% } %>

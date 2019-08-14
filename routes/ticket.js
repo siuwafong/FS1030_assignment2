@@ -20,7 +20,7 @@ module.exports = {
     console.log(cust_id);
 
     let createTicketQuery =
-      "INSERT INTO tickets (acquired_time, est_support_time, ticket_status, created_by) VALUES (NOW(), DATE_ADD(CURDATE(), INTERVAL 10 MINUTE), 'active', ?);";
+      "INSERT INTO tickets (acquired_time, est_support_time, ticket_status, created_by) VALUES (NOW(), DATE_ADD(NOW(), INTERVAL 10 MINUTE), 'active', ?);";
     db.query(createTicketQuery, [cust_id]);
     let query =
       "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets WHERE ticket_status = 'active' AND created_by = ?";
@@ -56,11 +56,11 @@ module.exports = {
     });
   },
 
-  deleteTicket: (req, res) => {
+  toggleTicket: (req, res) => {
     console.log(req.params.id);
     let ticket_no = req.params.id;
     let status = "";
-    let deleteTicketQuery = "";
+    let toggleTicketQuery = "";
 
     let statusQuery = "SELECT ticket_status FROM tickets WHERE ticket_no = ?;";
     db.query(statusQuery, [ticket_no], (err, result) => {
@@ -73,14 +73,15 @@ module.exports = {
         };
       });
       console.log(status[0]["ticket_status"]);
+
       if (status[0]["ticket_status"] === "active") {
-        deleteTicketQuery =
+        toggleTicketQuery =
           "UPDATE tickets SET ticket_status = 'completed' WHERE ticket_no = ? ;";
       } else if (status[0]["ticket_status"] === "completed") {
-        deleteTicketQuery =
+        toggleTicketQuery =
           "UPDATE tickets SET ticket_status = 'active' WHERE ticket_no = ? ;";
       }
-      db.query(deleteTicketQuery, [ticket_no], (err, result) => {
+      db.query(toggleTicketQuery, [ticket_no], (err, result) => {
         if (err) {
           throw err;
         }
