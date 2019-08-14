@@ -22,6 +22,7 @@
     "ejs": "^2.6.2",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.5",
+    "express-session": "^1.16.2",
     "mysql": "^2.17.1",
     "nodemon": "^1.19.1",
     "req-flash": "0.0.3"

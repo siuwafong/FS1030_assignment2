@@ -6,9 +6,21 @@
 <h3> Welcome, <%= full_name[0]['full_name'] %></h3>
 <h4> Customer ID: <%= full_name[0]['customer_id'] %> </h4>
 <p> Here are your active tickets.  To see all your tickets, click <a href="https://www.google.ca" class="font-italic"> here </a>  </p>
+
 <form method="post" enctype="multipart/form-data">
-<button href="/<%= full_name[0]['customer_id'] %>" name="create_ticket" id="create_ticket"> Create Ticket </button>
+<% let link = full_name[0]['customer_id'] %>
+<button href="/<%= link %>" name="create_ticket" id="create_ticket" class="btn btn-info"> Create Ticket </button>
 </form>
+
+<form method="post" action="/message/<%= link %>" enctype="multipart/form-data">
+<input  type="text" name="message" placeholder="Message"> </input>
+<input type="submit" />
+</form>
+
+<form method="post" enctype="multipart/form-data">
+<button href="/logout" name="logout" id="logout" class="btn btn-info"> Logout </button>
+</form>
+
 </div>
 
 <table class="table table-striped">

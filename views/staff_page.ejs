@@ -3,16 +3,34 @@
 <div class="jumbotron"> 
 <h1> STAFF PAGE </h1>
 <h2> TICKETS </h2>
+
+<form method="post" action='/logout'>
+    <button type="button" class="btn btn-info"> Logout </button>
+</form>
+
+
+
 </div>
-
-
 
 <table class="table table-striped" id="myTable2">
 <thead class="thead-dark">
-    <th onclick="sortTable(0)"> Ticket Number </th>
-    <th onclick="sortTable(1)"> Acquired Time </th>
-    <th onclick="sortTable(2)"> Estimated Support Time </th>
-    <th onclick="sortTable(3)"> Ticket Status </th>
+    <th> Customer ID </th>
+    <th> Most Recent Message </th>
+</thead>
+
+<% for(let i = 0; i < ticket_details.length; i++) {%>
+    <tr>
+    <td> <%= ticket_details[i]['cust_id'] %></td>
+    <td> <%= ticket_details[i]['message'] %> </td> 
+    </tr>
+<% } %>
+
+<table class="table table-striped" id="myTable2">
+<thead class="thead-dark">
+    <th> Ticket Number </th>
+    <th> Acquired Time </th>
+    <th> Estimated Support Time </th>
+    <th> Ticket Status </th>
 </thead>
 <tbody>
 <% for(let i = 0; i < tickets.length; i++) {%>

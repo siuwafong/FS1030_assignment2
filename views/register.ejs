@@ -1,0 +1,16 @@
+<% include partials/header.ejs %>
+
+<div class="jumbotron">
+<h1> Register </h1>
+</div>
+
+<form method="post" action="/register">
+    <input type="lname" name="lname" placeholder="Last Name" required />
+    <input type="fname" name="fname" placeholder="First Name" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <input type="submit" />
+</form>
+
+
+
+<% include partials/footer.ejs%>

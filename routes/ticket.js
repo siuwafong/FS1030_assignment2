@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const path = require("path");
 const app = express();
+const session = require("express-session");
 
 const db = mysql.createConnection({
   // Replace with user-appropriate values
@@ -72,7 +73,6 @@ module.exports = {
           ticket_status: res.ticket_status
         };
       });
-      console.log(status[0]["ticket_status"]);
 
       if (status[0]["ticket_status"] === "active") {
         toggleTicketQuery =
@@ -88,39 +88,51 @@ module.exports = {
         res.redirect("/");
       });
     });
+  },
 
-    // let query =
-    //   "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets";
-    // db.query(query, [ticket_no], (err, result) => {
-    //   if (err) {
-    //     throw err;
-    //   }
-    //   const tickets = result.map(res => {
-    //     return {
-    //       ticket_no: res.ticket_no,
-    //       acquired_time: res.acquired_time,
-    //       est_support_time: res.est_support_time,
-    //       ticket_status: res.ticket_status
-    //     };
-    //   });
-    //   res.render("staff_page.ejs", { tickets: tickets });
+  customer_login: (req, res) => {
+    loginRequest = req.params.id;
+    if (err) {
+      throw err;
+    }
+    res.render(loginRequest);
+  },
 
-    //   let query2 =
-    //     "SELECT ticket_no, DATE_FORMAT(acquired_time, '%H:%i, %d/%m/%Y') AS acquired_time, DATE_FORMAT(est_support_time, '%H:%i, %d/%m/%Y') AS est_support_time, ticket_status  FROM tickets";
-    //   db.query(query2, (err, result) => {
-    //     if (err) {
-    //       throw err;
-    //     }
-    //     const tickets = result.map(res => {
-    //       return {
-    //         ticket_no: res.ticket_no,
-    //         acquired_time: res.acquired_time,
-    //         est_support_time: res.est_support_time,
-    //         ticket_status: res.ticket_status
-    //       };
-    //     });
-    //     res.render("staff_page.ejs", { tickets: tickets });
-    //   });
-    // });
+  register: (req, res) => {
+    registerRequest = req.params.id;
+    if (err) {
+      throw err;
+    }
+    res.render(registerRequest);
+  },
+
+  redirectLogin: (req, res, next) => {
+    if (!req.session.userId) {
+      res.redirect("/customer_login");
+    } else {
+      next();
+    }
+  },
+
+  redirectHome: (req, res, next) => {
+    if (req.session.userId) {
+      res.redirect("/register");
+    } else {
+      next();
+    }
+  },
+
+  postMessage: (req, res) => {
+    let cust_id = req.params.id;
+    let message = req.body.message;
+    console.log(cust_id + message);
+    let createMessageQuery =
+      "UPDATE ticket_details SET message = ? WHERE cust_id = ?;";
+    db.query(createMessageQuery, [message, cust_id], (err, result) => {
+      if (err) {
+        throw err;
+      }
+      res.redirect("/" + cust_id);
+    });
   }
 };

@@ -1,0 +1,14 @@
+<% include partials/header.ejs %>
+
+<div class="jumbotron">
+<h1> Customer Login </h1>
+</div>
+
+<form method="post" action="/customer_login">
+    <input type="name" name="name" placeholder="Last Name" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <input type="submit" />
+    </form>
+
+
+<% include partials/footer.ejs %>
